@@ -88,7 +88,6 @@ function formatDaysToYMD(totalDays) {
   return parts.join(" ");
 }
 
-
 function interpolateCustomDays(amount) {
   // Clamp amount between minimum and maximum tier values
   amount = Math.max(5, Math.min(150, amount));
@@ -537,4 +536,4 @@ function setupDraggableTelegramButton() {
     doDrag(touch.clientX, touch.clientY);
   });
   document.addEventListener('touchend', endDrag);
-}
+    }
