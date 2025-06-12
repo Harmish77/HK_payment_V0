@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPI Subscription Payment - Movie Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body oncontextmenu="return false;">
+  <button id="toggleBtn" class="toggle-btn dark" aria-label="Toggle dark/light mode">☀️</button>
+
+  <div class="card">
+    <div class="container">
+      <a href="https://t.me/hks_movie_bot" target="_blank" style="text-decoration: none;">
+        <img src="movie hub logo.jpg" alt="Movie Hub Logo" class="logo">
+      </a>
+      <a href="https://t.me/main_movie_hub" target="_blank" style="text-decoration: none; color: inherit;">
+        <div class="title">MOVIE HUB</div>
+      </a>
+    </div>
+
+    <h2>Activate Premium Access</h2>
+    <select id="amount" aria-label="Select subscription amount">
+      <optgroup label="Short-Term">
+        <option value="5">₹5 - 3 Days (Trial Plan)</option>
+        <option value="10">₹10 - 1 Week</option>
+      </optgroup>
+      <optgroup label="Long-Term">
+        <option value="25">₹25 - 1 Month</option>
+        <option value="60">₹60 - 3 Months (Save 20%)</option>
+        <option value="100">₹100 - 6 Months (Save 33%)</option>
+        <option value="150">₹150 - 1 Year (Save 40%)</option>
+      </optgroup>
+      <option value="custom">Custom Amount</option>
+    </select>
+
+    <div id="customAmountDiv" style="display: none;">
+      <label for="customAmountInput">Enter Custom Amount:</label>
+      <input type="number" id="customAmountInput" min="1" max="500" aria-label="Enter custom amount">
+      <p style="color:red;">
+        * Your period of premium subscription is set as per the amount you pay.
+      </p>
+    </div>
+    <p id="period"></p>
+    <div id="upiId">UPI ID : harmish@superyes</div>
+    
+    <img id="qrCode" class="qr" src="" alt="UPI QR Code" width="250" height="250" crossorigin="anonymous">
+
+    <button id="downloadBtn" aria-label="Download QR Code">Download QR Code</button>
+   
+    <button id="paymentDoneBtn" aria-label="Payment done button">
+      Payment Done
+    </button>
+    <div id="confirmation-msg"></div>
+
+    <div id="payment-form">
+      <h3>Confirm Your Payment</h3>
+      <p>Enter your Telegram username and UPI Transaction ID</p>
+
+      <input type="text" id="username" placeholder="Telegram Username (without @)" aria-label="Telegram username">
+      <div id="username-error"></div>
+
+      <input type="text" id="txnId" placeholder="Transaction ID (12 digits only)" maxlength="12" aria-label="Transaction ID">
+      <div id="txnId-error"></div>
+
+      <button id="submitBtn" disabled aria-label="Submit payment details">
+        Submit & Send Screenshot
+      </button>
+    </div>
+
+    <div class="note">
+      <strong>How to Pay:</strong><br />
+      • Take a screenshot or download this QR code<br />
+      • Open your UPI app<br />
+      • Choose "Scan from Gallery"<br />
+      • Select the saved QR image to complete the payment<br />
+      <strong>After Payment:</strong><br />
+      • Click the "Payment Done" button below<br/>
+      • Fill in your payment details and click Submit<br />
+      • You will be redirected to my Telegram account<br />
+      • Send a message with your payment screenshot<br />
+      • Give us sometime to add you in PREMIUM LIST.<br /><br />
+    </div>
+
+    <footer>
+      <div class="site-name">MovieHub</div>
+      <small>© 2025 Harmish. All rights reserved.</small>
+    </footer>
+  </div>
+  
+  <a href="https://t.me/Mr_HKs" target="_blank" id="telegram-btn" title="Contact Support on Telegram" aria-label="Contact support on Telegram">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+      <circle cx="120" cy="120" r="120" fill="#0088cc"/>
+      <path fill="#ffffff" d="M180.6 77.8l-25.9 122.2c-2 9-7.2 11.3-14.6 7.1l-40.5-29.9-19.5 18.8c-2.2 2.2-4 4-8.2 4l3-42.7 77.8-70.3c3.4-3-0.7-4.7-5.3-1.7L78.6 138.3l-41.1-13c-8.9-2.8-9-8.9 1.8-13.2L171 70.5c7.9-2.9 14.8 1.9 11.4 7.3z"/>
+    </svg>
+  </a>
+
+  <div id="toast">QR code downloaded!</div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

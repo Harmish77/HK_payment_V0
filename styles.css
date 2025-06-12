@@ -1,0 +1,529 @@
+:root {
+  --bg-light: #f9fafb;
+  --bg-dark: #1e1e2f;
+  --text-light: #111;
+  --text-dark: #fff;
+  --primary: #fbbf24;
+  --glass: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.4s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 70px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.logo:hover {
+  box-shadow: 0 0 25px 5px rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.title {
+  font-size: 42px;
+  font-weight: 900;
+  color: red;
+  letter-spacing: 1.5px;
+  margin: 0;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: fadeInZoom 2s ease-out forwards, glowPulse 4s ease-in-out infinite 2s;
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff,
+               0 0 10px red, 0 0 20px red, 0 0 30px white;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.title:hover {
+  transform: scale(1.08);
+  text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff,
+               0 0 25px red, 0 0 35px white, 0 0 45px white;
+}
+
+@keyframes fadeInZoom {
+  0% { opacity: 0; transform: scale(0.6); text-shadow: none; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff,
+                 0 0 15px red, 0 0 25px red, 0 0 35px white;
+  }
+  50% {
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff,
+                 0 0 5px white, 0 0 10px red, 0 0 15px white;
+  }
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  max-width: 420px;
+  width: 100%;
+  color: var(--text-dark);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.light-mode .card {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-light);
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+select, button, input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+select {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.light-mode select {
+  background: #f1f5f9;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: var(--primary);
+  color: #111;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #facc15;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+img.qr {
+  border-radius: 10px;
+  margin-bottom: 10px;
+  max-width: 100%;
+}
+
+.note {
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.light-mode .note {
+  background: #e2e8f0;
+}
+
+#toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #22c55e;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 8px;
+  display: none;
+  z-index: 999;
+}
+
+.toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s;
+}
+
+.toggle-btn.dark {
+  background: #000;
+  color: #fff;
+}
+
+.toggle-btn.light {
+  background: #fff;
+  color: #000;
+}
+
+#upiId {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 10px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+
+#upiId::after {
+  content: "Tap here to copy";
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#upiId:hover::after {
+  opacity: 1;
+}
+
+#upiId.copied::after {
+  content: "Copied!";
+  color: #22c55e;
+}
+
+input.error {
+  border: 1px solid red;
+  background-color: #ffdddd;
+}
+
+#telegram-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #0088cc;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 1000;
+}
+
+#telegram-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+footer {
+  background-color: #121212;
+  color: #cccccc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 10px 0px;
+  text-align: center;
+  border-top: 3px solid #ff4500;
+}
+
+footer .site-name {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #ff4500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+footer small {
+  font-size: 0.8rem;
+  color: #555555;
+  display: block;
+  margin-top: 12px;
+}
+
+#payment-form {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.6s ease;
+  margin: 30px auto;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  text-align: center;
+}
+
+#payment-form h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+#payment-form input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background-color: white;
+  color: black;
+}
+
+#payment-form button {
+  padding: 12px 20px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
+#confirmation-msg {
+  color: white;
+  font-weight: bold;
+  margin-top: 15px;
+  display: none;
+}
+
+#paymentDoneBtn {
+  margin-top: 5px;
+  padding: 10px 20px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0px;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-bottom: 5px;
+  display: none;
+  text-align: left;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+optgroup {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+optgroup option {
+  font-weight: normal;
+  color: white;
+}
+
+.light-mode optgroup option {
+  color: #333;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+    margin: 15px;
+    width: calc(100% - 30px);
+  }
+  
+  .toggle-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  #telegram-btn {
+    width: 44px;
+    height: 44px;
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  footer .site-name {
+    font-size: 1.2rem;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+}
+
+button:focus, input:focus, select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Comparison Table Styles */
+.comparison-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.light-mode .comparison-container {
+    background: white;
+    color: #333;
+    border: 1px solid #e1e1e1;
+}
+
+.dark-mode .comparison-container {
+    background: #2d3748;
+    color: #f7fafc;
+    border: 1px solid #4a5568;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.comparison-table th, .comparison-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid;
+}
+
+.light-mode .comparison-table th, 
+.light-mode .comparison-table td {
+    border-color: #e1e1e1;
+}
+
+.dark-mode .comparison-table th, 
+.dark-mode .comparison-table td {
+    border-color: #4a5568;
+}
+
+.comparison-table th {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .comparison-table th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.comparison-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark-mode .comparison-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.highlight-plan {
+    position: relative;
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.light-mode .highlight-plan {
+    background-color: #f0f7ff;
+    border: 1px solid #b3d4ff;
+}
+
+.dark-mode .highlight-plan {
+    background-color: #1a365d;
+    border: 1px solid #2c5282;
+}
+
+.badge-popular {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background: #4299e1;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.price-per-day {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.savings-badge {
+    background: #48bb78;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.back-btn {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
