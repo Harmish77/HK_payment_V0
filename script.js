@@ -517,8 +517,15 @@ async function submitPayment() {
 
     // Encode for URL
     const encodedMessage = encodeURIComponent(message);
-    const botUsername = "moviehubpayment_bot"; // Your bot's username
-    const tgLink = `https://t.me/${botUsername}?start=${encodedMessage}`;
+    const botUsername = "moviehubpayment_bot";
+    const paymentData = {
+      username: safeUsername,
+      txnId: safeTxnId,
+      amount: amount,
+      period: period
+    };
+    const startParam = `payment_${encodeURIComponent(JSON.stringify(paymentData))}`;
+    const tgLink = `https://t.me/${botUsername}?start=${startParam}`;
 
     // Auto-hide form
     elements.paymentForm.style.opacity = "0";
