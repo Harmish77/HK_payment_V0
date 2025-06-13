@@ -38,25 +38,47 @@ const elements = {
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
   // Set up event listeners
-  elements.amountSelect.addEventListener('change', onAmountChange);
-  elements.customAmountInput.addEventListener('input', validateCustomAmount);
-  elements.upiIdElement.addEventListener('click', copyUPIId);
-  elements.downloadBtn.addEventListener('click', downloadQR);
-  elements.paymentDoneBtn.addEventListener('click', showForm);
-  elements.submitBtn.addEventListener('click', submitPayment);
-  elements.toggleBtn.addEventListener('click', toggleMode);
+  if (elements.amountSelect) {
+    elements.amountSelect.addEventListener('change', onAmountChange);
+  }
+  
+  if (elements.customAmountInput) {
+    elements.customAmountInput.addEventListener('input', validateCustomAmount);
+  }
+  
+  if (elements.upiIdElement) {
+    elements.upiIdElement.addEventListener('click', copyUPIId);
+  }
+  
+  if (elements.downloadBtn) {
+    elements.downloadBtn.addEventListener('click', downloadQR);
+  }
+  
+  if (elements.paymentDoneBtn) {
+    elements.paymentDoneBtn.addEventListener('click', showForm);
+  }
+  
+  if (elements.submitBtn) {
+    elements.submitBtn.addEventListener('click', submitPayment);
+  }
+  
+  if (elements.toggleBtn) {
+    elements.toggleBtn.addEventListener('click', toggleMode);
+  }
   
   // Validate inputs in real-time
-  elements.usernameInput.addEventListener('input', validateForm);
-  elements.txnIdInput.addEventListener('input', validateForm);
+  if (elements.usernameInput) {
+    elements.usernameInput.addEventListener('input', validateForm);
+  }
+  
+  if (elements.txnIdInput) {
+    elements.txnIdInput.addEventListener('input', validateForm);
+  }
   
   // Initialize QR code
   generateQR();
   
-  // Make Telegram button draggable
-  setupDraggableTelegramButton();
-  
-  // Initialize theme
+  // Check theme preference
   checkThemePreference();
 });
 
@@ -129,6 +151,8 @@ function interpolateCustomDays(amount) {
 
 // Updated period display function
 function updatePeriod(amountValue) {
+  if (!elements.periodDisplay) return;
+  
   if (!amountValue || amountValue === "") {
     elements.periodDisplay.innerText = "";
     return;
@@ -178,11 +202,15 @@ function updatePeriod(amountValue) {
 
 // Handle amount selection change
 function onAmountChange() {
+  if (!elements.amountSelect || !elements.customAmountDiv || !elements.customAmountInput) return;
+  
   if (elements.amountSelect.value === "custom") {
     elements.customAmountDiv.style.display = "block";
     elements.customAmountInput.value = "";
     elements.customAmountInput.setAttribute("max", "150");
-    elements.periodDisplay.innerText = "";
+    if (elements.periodDisplay) {
+      elements.periodDisplay.innerText = "";
+    }
     elements.customAmountInput.focus();
   } else {
     elements.customAmountDiv.style.display = "none";
@@ -193,6 +221,8 @@ function onAmountChange() {
 
 // Validate custom amount input
 function validateCustomAmount() {
+  if (!elements.customAmountInput) return;
+  
   const value = parseInt(elements.customAmountInput.value);
   
   if (isNaN(value)) {
@@ -201,9 +231,9 @@ function validateCustomAmount() {
   
   if (value > 150) {
     elements.customAmountInput.value = 150;
-    alert("Maximum custom amount is ₹150");
+    showToast("Maximum custom amount is ₹150");
   } else if (value < 1) {
-    alert("Minimum custom amount is ₹5");
+    showToast("Minimum custom amount is ₹5");
     elements.customAmountInput.value = 5;
   }
   
@@ -212,26 +242,41 @@ function validateCustomAmount() {
 
 // Copy UPI ID to clipboard
 function copyUPIId() {
+  if (!elements.upiIdElement) return;
+  
   navigator.clipboard.writeText(upiId)
     .then(() => {
       elements.upiIdElement.classList.add("copied");
-      setTimeout(() => elements.upiIdElement.classList.remove("copied"), 1500);
+      setTimeout(() => {
+        if (elements.upiIdElement) {
+          elements.upiIdElement.classList.remove("copied");
+        }
+      }, 1500);
+      showToast("UPI ID copied to clipboard!");
+    })
+    .catch(err => {
+      console.error("Failed to copy UPI ID:", err);
+      showToast("Failed to copy UPI ID", "error");
     });
 }
 
 // Generate QR code with debounce for custom amounts
 function generateQR() {
+  if (!elements.amountSelect || !elements.qrCodeImage) return;
+  
   const select = elements.amountSelect;
   let value = select.value;
   
   if (value === "custom") {
-    value = elements.customAmountInput.value || 5; // Default to 5 if empty
+    value = elements.customAmountInput ? elements.customAmountInput.value || 5 : 5;
     clearTimeout(qrTimeout);
     qrTimeout = setTimeout(() => {
       // Validate amount is at least 5
       if (value < 5) {
         showToast("Minimum amount is ₹5", "error");
-        elements.customAmountInput.value = 5;
+        if (elements.customAmountInput) {
+          elements.customAmountInput.value = 5;
+        }
         value = 5;
       }
       updatePeriod(value);
@@ -245,6 +290,8 @@ function generateQR() {
 
 // Create the actual QR code
 function createQRCode(amount) {
+  if (!elements.qrCodeImage) return;
+  
   amount = Math.max(5, amount); // Ensure amount is never less than 5
   Amt = amount;
   const tier = tiers.find(t => t.amount === Number(amount));
@@ -317,40 +364,48 @@ function createQRCode(amount) {
 
 // Download QR code as PNG
 function downloadQR() {
-  const img = elements.qrCodeImage;
-  if (!img.src) {
-    alert("Please generate the QR code first.");
+  if (!elements.qrCodeImage || !elements.qrCodeImage.src) {
+    showToast("Please generate the QR code first", "error");
     return;
   }
   
   const link = document.createElement('a');
-  link.href = img.src;
+  link.href = elements.qrCodeImage.src;
   link.download = `MovieHub-Payment-₹${Amt}.png`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   
-  // Show toast notification
   showToast("QR code downloaded!");
 }
 
 // Show payment form
 function showForm() {
-  elements.paymentForm.style.opacity = "5";
+  if (!elements.paymentForm || !elements.paymentDoneBtn) return;
+  
+  elements.paymentForm.style.opacity = "1";
   elements.paymentForm.style.maxHeight = "500px";
   elements.paymentForm.style.padding = "20px";
   elements.paymentForm.style.margin = "30px auto";
   elements.paymentDoneBtn.style.display = "none";
+  
+  // Scroll to form
+  elements.paymentForm.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Validate form inputs
 function validateForm() {
+  if (!elements.usernameInput || !elements.txnIdInput || 
+      !elements.usernameError || !elements.txnIdError || !elements.submitBtn) {
+    return;
+  }
+  
   const username = elements.usernameInput.value.trim();
   const txnId = elements.txnIdInput.value.trim();
   
   // Validate username
-  if (username.length < 3 || username.length > 32) {
-    elements.usernameError.textContent = "Username must be 3-32 characters";
+  if (username.length < 3 || username.length > 32 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+    elements.usernameError.textContent = "Username must be 3-32 characters (letters, numbers, _)";
     elements.usernameError.style.display = "block";
     elements.usernameInput.classList.add("error");
   } else {
@@ -372,6 +427,7 @@ function validateForm() {
   elements.submitBtn.disabled = !(
     username.length >= 3 && 
     username.length <= 32 && 
+    /^[a-zA-Z0-9_]+$/.test(username) &&
     /^\d{12}$/.test(txnId)
   );
 }
@@ -383,6 +439,14 @@ function sanitizeInput(input) {
 
 // Submit payment details
 async function submitPayment() {
+  if (!elements.usernameInput || !elements.txnIdInput || 
+      !elements.amountSelect || !elements.customAmountInput || 
+      !elements.submitBtn || !elements.confirmationMsg || 
+      !elements.paymentForm) {
+    showToast("System error: Form elements missing", "error");
+    return;
+  }
+  
   const username = elements.usernameInput.value.trim();
   const txnId = elements.txnIdInput.value.trim();
   const select = elements.amountSelect;
@@ -398,19 +462,23 @@ async function submitPayment() {
     // Validate inputs
     if (!validateUsername(username) || !/^\d{12}$/.test(txnId) || isNaN(amount) || amount <= 0) {
       if (!validateUsername(username)) {
-        elements.usernameInput.style.border = "2px solid red";
-        elements.usernameError.style.display = "block";
+        if (elements.usernameInput) elements.usernameInput.style.border = "2px solid red";
+        if (elements.usernameError) {
+          elements.usernameError.textContent = "Invalid Telegram username";
+          elements.usernameError.style.display = "block";
+        }
       }
       if (!/^\d{12}$/.test(txnId)) {
-        elements.txnIdInput.style.border = "2px solid red";
-        elements.txnIdError.style.display = "block";
+        if (elements.txnIdInput) elements.txnIdInput.style.border = "2px solid red";
+        if (elements.txnIdError) {
+          elements.txnIdError.textContent = "Transaction ID must be 12 digits";
+          elements.txnIdError.style.display = "block";
+        }
       }
       if (isNaN(amount) || amount <= 0 || amount > 150) {
-        alert("Please enter a valid amount between ₹5 and ₹150.");
-        return;
+        showToast("Please enter a valid amount between ₹5 and ₹150.", "error");
       }
-      alert("Please fill in all fields correctly.");
-      return;
+      throw new Error("Validation failed");
     }
     
     // Add small delay for better UX
@@ -423,54 +491,75 @@ async function submitPayment() {
     // Sanitize inputs
     const safeUsername = sanitizeInput(username);
     const safeTxnId = sanitizeInput(txnId);
-    
-    // Show confirmation message
-    elements.confirmationMsg.textContent = `Thank you, @${safeUsername}. Redirecting to Telegram...`;
+        // Show confirmation message
+    elements.confirmationMsg.innerHTML = `
+      <div class="confirmation-box">
+        <h3>Thank you for your payment!</h3>
+        <p>Transaction details:</p>
+        <ul>
+          <li>Username: @${safeUsername}</li>
+          <li>Amount: ₹${amount}</li>
+          <li>Period: ${period}</li>
+          <li>TXN ID: ${safeTxnId}</li>
+        </ul>
+        <p>Redirecting to Telegram for verification...</p>
+      </div>
+    `;
     elements.confirmationMsg.style.display = "block";
-    
+
+    // Build Telegram message
+    const message = `✅ Payment Form Submission\n\n` +
+                   `👤 Username: @${safeUsername}\n` +
+                   `💳 TXN ID: ${safeTxnId}\n` +
+                   `💰 Amount: ₹${amount}\n` +
+                   `⏳ Period: ${period}\n\n` +
+                   `📸 Please send your payment screenshot`;
+
+    // Encode for URL
+    const encodedMessage = encodeURIComponent(message);
+    const botUsername = "moviehubpayment_bot"; // Your bot's username
+    const tgLink = `https://t.me/${botUsername}?start=${encodedMessage}`;
+
     // Auto-hide form
     elements.paymentForm.style.opacity = "0";
     elements.paymentForm.style.maxHeight = "0";
-    
-    // Build Telegram message
-    const message = `👋 Hi there!%0A%0A✅ I have successfully completed the payment.%0A%0A📱 Telegram Username: %60@${encodeURIComponent(safeUsername)}%60%0A💳 Transaction ID: %60${encodeURIComponent(safeTxnId)}%60%0A💰 Amount Paid: %60₹${amount}%60%0A⏳ Time Period: %60${period}%60%0A%0A📸 I will send the payment screenshot shortly.%0A%0A🙏 Thank you!`;
-    
-    const tgLink = `https://t.me/Mr_HKs?text=${message}`;
-    
+    elements.paymentForm.style.padding = "0";
+    elements.paymentForm.style.margin = "0";
+
     // Open Telegram after short delay
     setTimeout(() => {
       window.open(tgLink, "_blank");
     }, 2000);
+
   } catch (error) {
     console.error("Submission error:", error);
-    alert("An error occurred. Please try again.");
+    showToast("Please check your inputs and try again", "error");
   } finally {
     elements.submitBtn.disabled = false;
     elements.submitBtn.textContent = "Submit & Send Screenshot";
   }
 }
 
-// Validate Telegram username format
-function validateUsername(username) {
-  return /^[a-z0-9_]{3,32}$/i.test(username) && !username.startsWith('@');
-}
-
 // Show toast notification
-function showToast(message = "QR code downloaded!", type = "success") {
-  const toast = elements.toast;
-  toast.textContent = message;
-  toast.style.backgroundColor = type === "error" ? "#ef4444" : "#22c55e";
+function showToast(message = "Operation completed", type = "success") {
+  if (!elements.toast) return;
   
-  toast.style.display = "block";
+  elements.toast.textContent = message;
+  elements.toast.style.backgroundColor = type === "error" ? "#ef4444" : "#22c55e";
+  elements.toast.style.display = "block";
+  
   setTimeout(() => {
-    toast.style.display = "none";
+    elements.toast.style.display = "none";
   }, 3000);
 }
 
 // Toggle dark/light mode
 function toggleMode() {
+  if (!elements.toggleBtn) return;
+  
   document.body.classList.toggle('light-mode');
   const isLight = document.body.classList.contains('light-mode');
+  
   elements.toggleBtn.textContent = isLight ? '🌙' : '☀️';
   elements.toggleBtn.classList.toggle('dark', !isLight);
   elements.toggleBtn.classList.toggle('light', isLight);
@@ -481,6 +570,8 @@ function toggleMode() {
 
 // Check for saved theme preference
 function checkThemePreference() {
+  if (!elements.toggleBtn) return;
+  
   const savedTheme = localStorage.getItem('themePreference');
   if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
@@ -490,50 +581,7 @@ function checkThemePreference() {
   }
 }
 
-// Setup draggable Telegram button
-function setupDraggableTelegramButton() {
-  const btn = document.getElementById("telegram-btn");
-  let isDragging = false;
-  let offsetX, offsetY;
-
-  function startDrag(x, y) {
-    isDragging = true;
-    offsetX = x - btn.getBoundingClientRect().left;
-    offsetY = y - btn.getBoundingClientRect().top;
-    btn.style.cursor = 'grabbing';
-  }
-
-  function doDrag(x, y) {
-    if (!isDragging) return;
-    btn.style.left = (x - offsetX) + 'px';
-    btn.style.top = (y - offsetY) + 'px';
-    btn.style.right = 'auto';
-    btn.style.bottom = 'auto';
-  }
-
-  function endDrag() {
-    isDragging = false;
-    btn.style.cursor = 'grab';
-  }
-
-  // Mouse events
-  btn.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    startDrag(e.clientX, e.clientY);
-  });
-  document.addEventListener('mousemove', (e) => {
-    doDrag(e.clientX, e.clientY);
-  });
-  document.addEventListener('mouseup', endDrag);
-
-  // Touch events
-  btn.addEventListener('touchstart', (e) => {
-    const touch = e.touches[0];
-    startDrag(touch.clientX, touch.clientY);
-  });
-  document.addEventListener('touchmove', (e) => {
-    const touch = e.touches[0];
-    doDrag(touch.clientX, touch.clientY);
-  });
-  document.addEventListener('touchend', endDrag);
+// Validate Telegram username format
+function validateUsername(username) {
+  return /^[a-zA-Z0-9_]{3,32}$/.test(username.replace('@', ''));
     }
