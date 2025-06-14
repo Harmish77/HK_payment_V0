@@ -437,114 +437,74 @@ function sanitizeInput(input) {
   return input.replace(/[<>'"&]/g, '');
 }
 
-// Submit payment details
 async function submitPayment() {
   if (!elements.usernameInput || !elements.txnIdInput || 
-      !elements.amountSelect || !elements.customAmountInput || 
-      !elements.submitBtn || !elements.confirmationMsg || 
-      !elements.paymentForm) {
+      !elements.amountSelect || !elements.customAmountInput) {
     showToast("System error: Form elements missing", "error");
     return;
   }
   
-  const username = elements.usernameInput.value.trim();
+  // Get and validate form values
+  const username = elements.usernameInput.value.trim().replace('@', '');
   const txnId = elements.txnIdInput.value.trim();
-  const select = elements.amountSelect;
-  const customInput = elements.customAmountInput;
+  const amount = elements.amountSelect.value === "custom" 
+    ? Number(elements.customAmountInput.value.trim()) 
+    : Number(elements.amountSelect.value);
   
-  // Disable button during submission
+  if (!validateUsername(username) || !/^\d{12}$/.test(txnId) || isNaN(amount) || amount <= 0) {
+    showToast("Please check your inputs", "error");
+    return;
+  }
+
+  // Calculate period
+  const days = interpolateCustomDays(amount);
+  const period = formatDaysToYMD(days);
+
+  // Create compact payment string
+  const paymentString = `${username}|${txnId}|${amount}|${period.replace(/\s+/g, '')}`;
+  
+  // Base64 encode (shorter than JSON)
+  const encodedData = btoa(paymentString).replace(/=/g, '');
+  
+  // Generate Telegram links
+  const botUsername = "moviehubpayment_bot";
+  const links = {
+    app: `tg://resolve?domain=${botUsername}&start=${encodedData}`,
+    web: `https://t.me/${botUsername}?start=${encodedData}`
+  };
+
+  // Show processing UI
   elements.submitBtn.disabled = true;
-  elements.submitBtn.textContent = "Processing...";
+  elements.submitBtn.textContent = "Redirecting...";
   
-  try {
-    const amount = select.value === "custom" ? Number(customInput.value.trim()) : Number(select.value);
-    
-    // Validate inputs
-    if (!validateUsername(username) || !/^\d{12}$/.test(txnId) || isNaN(amount) || amount <= 0) {
-      if (!validateUsername(username)) {
-        if (elements.usernameInput) elements.usernameInput.style.border = "2px solid red";
-        if (elements.usernameError) {
-          elements.usernameError.textContent = "Invalid Telegram username";
-          elements.usernameError.style.display = "block";
-        }
-      }
-      if (!/^\d{12}$/.test(txnId)) {
-        if (elements.txnIdInput) elements.txnIdInput.style.border = "2px solid red";
-        if (elements.txnIdError) {
-          elements.txnIdError.textContent = "Transaction ID must be 12 digits";
-          elements.txnIdError.style.display = "block";
-        }
-      }
-      if (isNaN(amount) || amount <= 0 || amount > 150) {
-        showToast("Please enter a valid amount between ₹5 and ₹150.", "error");
-      }
-      throw new Error("Validation failed");
+  // Try to open Telegram app first
+  window.location.href = links.app;
+  
+  // Fallback to web after delay
+  setTimeout(() => {
+    if (!document.hidden) {
+      window.open(links.web, '_blank');
     }
     
-    // Add small delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Calculate time period
-    const days = interpolateCustomDays(amount);
-    const period = formatDaysToYMD(days);
-    
-    // Sanitize inputs
-    const safeUsername = sanitizeInput(username);
-    const safeTxnId = sanitizeInput(txnId);
-        // Show confirmation message
+    // Show confirmation with manual option
     elements.confirmationMsg.innerHTML = `
       <div class="confirmation-box">
-        <h3>Thank you for your payment!</h3>
-        <p>Transaction details:</p>
-        <ul>
-          <li>Username: @${safeUsername}</li>
-          <li>Amount: ₹${amount}</li>
-          <li>Period: ${period}</li>
-          <li>TXN ID: ${safeTxnId}</li>
-        </ul>
-        <p>Redirecting to Telegram for verification...</p>
+        <h3>Payment Successful!</h3>
+        <p>If not redirected automatically:</p>
+        <ol>
+          <li>Open Telegram</li>
+          <li>Search for @${botUsername}</li>
+          <li>Send: <code>/start ${encodedData}</code></li>
+        </ol>
+        <a href="${links.web}" class="telegram-button">
+          Open Telegram Now
+        </a>
       </div>
     `;
     elements.confirmationMsg.style.display = "block";
-
-    // Build Telegram message
-    const message = `✅ Payment Form Submission\n\n` +
-                   `👤 Username: @${safeUsername}\n` +
-                   `💳 TXN ID: ${safeTxnId}\n` +
-                   `💰 Amount: ₹${amount}\n` +
-                   `⏳ Period: ${period}\n\n` +
-                   `📸 Please send your payment screenshot`;
-
-    // Encode for URL
-    const encodedMessage = encodeURIComponent(message);
-    const botUsername = "moviehubpayment_bot";
-    const paymentData = {
-      username: safeUsername,
-      txnId: safeTxnId,
-      amount: amount,
-      period: period
-    };
-    const startParam = `payment_${encodeURIComponent(JSON.stringify(paymentData))}`;
-    const tgLink = `https://t.me/${botUsername}?start=${startParam}`;
-
-    // Auto-hide form
-    elements.paymentForm.style.opacity = "0";
-    elements.paymentForm.style.maxHeight = "0";
-    elements.paymentForm.style.padding = "0";
-    elements.paymentForm.style.margin = "0";
-
-    // Open Telegram after short delay
-    setTimeout(() => {
-      window.open(tgLink, "_blank");
-    }, 2000);
-
-  } catch (error) {
-    console.error("Submission error:", error);
-    showToast("Please check your inputs and try again", "error");
-  } finally {
     elements.submitBtn.disabled = false;
     elements.submitBtn.textContent = "Submit & Send Screenshot";
-  }
+  }, 800);
 }
 
 // Show toast notification
@@ -591,4 +551,4 @@ function checkThemePreference() {
 // Validate Telegram username format
 function validateUsername(username) {
   return /^[a-zA-Z0-9_]{3,32}$/.test(username.replace('@', ''));
-    }
+  }
